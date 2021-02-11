@@ -34,7 +34,7 @@ A Cross-Platform Sports Streaming Discord Bot!
 
 
 ## Example
-![Loading Example...](https://gph.is/g/Z8oMwMA)
+![Loading Example...](https://gph.is/g/Z8oMwMA.gif)
 
 
 ## Questions/Suggestions/Bug Reports
