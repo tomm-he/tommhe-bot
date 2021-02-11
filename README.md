@@ -6,17 +6,36 @@
 
 A Cross-Platform Sports Streaming Discord Bot!
 
-[![Setup](http://i.imgur.com/VvXYp5j.png)](https://github.com/jagrosh/MusicBot/wiki/Setup)
 
 ## Features
   * Easy to run (just make sure Python is installed, and run!)
-  * Custom prefix!
+  * Custom Prefix!
+  * Commands For All Major Sports!
+
+## Commands
+  * help
+  * prefix
+  * match
+  * names
+  * nfl
+  * nflnames
+  * nhl
+  * nhlnames
+  * nba
+  * nbanames
+  * f1 
+  * f1names 
+  * motogp
+  * motogpnames
+  * ufc
+  * ufcnames
+  * boxing
+  * boxingnames
+
 
 ## Example
-![Loading Example...](https://i.gyazo.com/49ed558715607816b2782362bf5fb228.mp4)
+![Loading Example...](https://gph.is/g/Z8oMwMA)
 
-## Setup
-Please see the [Setup Page](https://github.com/jagrosh/MusicBot/wiki/Setup) in the wiki to run this bot yourself!
 
 ## Questions/Suggestions/Bug Reports
 **To Contact Me DM Me On Discord tommhe#0964**
