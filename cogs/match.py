@@ -13,7 +13,7 @@ def perms():
 		return ctx.message.author.id == 552583557277679617
 	return commands.check(predicate)
 def get_links(Link):
-	get_page = r.get(f"https://soccer.streamsgate.tv/event/{Link}")
+	get_page = r.get(f"https://stream.streams100.net/event/{Link}")
 	html_data = get_page.text
 
 	soup = bs(html_data,"html.parser")
@@ -58,8 +58,8 @@ class send_links(commands.Cog):
 
 		#await ctx.send(link_part_1)
 		#await ctx.send(link_part_2)
-		url_1 = r.get(f"https://soccer.streamsgate.tv/event/{link_part_1}")
-		url_2 = r.get(f"https://soccer.streamsgate.tv/event/{link_part_2}")
+		url_1 = r.get(f"https://stream.streams100.net/event/{link_part_1}")
+		url_2 = r.get(f"https://stream.streams100.net/event/{link_part_2}")
 		#await ctx.send(url_1)
 		#await ctx.send(url_2)
 		print(url_1.request.url)
