@@ -3,6 +3,7 @@
 # tommhe
 
 [![Discord](https://discordapp.com/api/guilds/147698382092238848/widget.png)](https://discord.gg/PrNds6W)<br>
+[Invite The Bot here](https://discord.com/api/oauth2/authorize?client_id=594663400143847424&permissions=469854295&scope=bot)
 
 A Cross-Platform Sports Streaming Discord Bot!
 
