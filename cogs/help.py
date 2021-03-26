@@ -7,6 +7,8 @@ import datetime
 
 from discord.ext import commands
 
+extensions = ["cogs.help","cogs.boxing","cogs.boxingnames","cogs.match","cogs.motogp","cogs.motogpnames","cogs.names","cogs.nba","cogs.nhl","cogs.nhlnames","cogs.ufc","cogs.ufcnames","cogs.f1","cogs.f1names","cogs.nfl","cogs.nflnames"]
+
 
 
 
@@ -55,6 +57,23 @@ class help(commands.Cog):
         embed.set_footer(text= "[p]help")
         await ctx.send(embed=embed)
         await ctx.message.delete()
+        
+    @commands.command()
+    @comands.is_owner()
+    async def reload(self,ctx):
+        try:
+            for cogs in extensions:
+                self.bot.reload_extension(cogs)
+            
+                em = discord.Embed(color=random.randint(0, 0xFFFFFF))
+                em.description = "All Cogs Reloaded Successfully."
+                
+            await ctx.send(embed=em)
+
+        except commands.ExtensionError as e:
+            em = discord.Embed(color=random.randint(0, 0xFFFFFF))
+            em.description = f"{e.__class__.__name__}: {e}"
+            await ctx.send(embed=em)
 
 
 def setup(bot):
