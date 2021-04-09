@@ -59,7 +59,7 @@ class help(commands.Cog):
         await ctx.message.delete()
         
     @commands.command()
-    @comands.is_owner()
+    @commands.is_owner()
     async def reload(self,ctx):
         try:
             for cogs in extensions:
