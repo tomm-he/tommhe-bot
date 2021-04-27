@@ -4,6 +4,7 @@ import discord
 import random
 import sqlite3
 import datetime
+import requests
 from pyowm import OWM
 
 from discord.ext import commands
@@ -141,6 +142,87 @@ class help(commands.Cog):
             e = discord.Embed(color=random.randint(0, 0xFFFFFF))
             em.description = f"The Location Parameter {city} Was Wrong, and I Could Not Grab Data For That. Please Try Again"
             await ctx.reply(embed=e) 
+            
+    @commands.command()
+    async def breakingbad(self,ctx, *, character = None):
+        """ A Breaking Bad Character Database command that adapts to a inconsistent and buggy api -_- """
+        await ctx.message.delete()
+
+        char = str(character).replace(" ","+")
+
+        try:
+            if character is not None:
+                r = requests.get(f"https://www.breakingbadapi.com/api/characters?name={char}").json()[0]
+            else:
+                r = requests.get("https://www.breakingbadapi.com/api/character/random").json()[0]
+
+            name = r["name"]
+            birthday = r["birthday"]
+            job = r["occupation"][0:10]
+            image = r["img"]
+            status = r["status"]
+            nickname = r["nickname"]
+            actor = r["portrayed"]
+            bettercallsaul = r["better_call_saul_appearance"]
+            appearance = r["appearance"]
+
+            if birthday == []:
+                birthday = "Unknown"
+
+            occupation = "\n".join(job)
+            appearedin = ",".join(map(str,appearance))
+
+            rname = name.replace(" ","+")
+            deathsr = requests.get(f"https://www.breakingbadapi.com/api/death-count?name={rname}").json()[0]
+            deaths = deathsr["deathCount"]
+
+            if bettercallsaul == []:
+                bettercallsaul = "No"
+            else:
+                bettercallsaul = "Yes"
+
+            em = discord.Embed(color=random.randint(0, 0xFFFFFF),title=f"*{name}* - *{birthday}* - *S {appearedin}*")
+            em.set_author(name=name,icon_url=image)
+            em.set_thumbnail(url=image)
+            em.timestamp = datetime.datetime.utcnow()
+            em.add_field(name=f"Status:",value=f"[``{status}``]")
+            em.add_field(name=f"Nickname:",value=f"[``{nickname}``]")
+            em.add_field(name=f"Job/Purpose:",value=f"[``{occupation}``]")
+            em.add_field(name=f"Played By:",value=f"[``{actor}``]")
+            em.add_field(name=f"Deaths Responsible For:",value=f"[``{deaths}/271``]")
+            em.add_field(name=f"Appears In Better Call Saul?:",value=f"[``{bettercallsaul}``]")
+
+            if not requests.get(f"https://www.breakingbadapi.com/api/quote/random?author={rname}").json() == []:
+                quoter = requests.get(f"https://www.breakingbadapi.com/api/quote/random?author={rname}").json()
+                q = quoter[0]
+                randomquote = q["quote"]
+                em.add_field(name=f"Random Quote By {name}",value=f"[``{randomquote}``]")
+
+            if not requests.get(f"https://www.breakingbadapi.com/api/death?name={rname}").json() == []:
+                deathinfor = requests.get(f"https://www.breakingbadapi.com/api/death?name={rname}").json()
+                de = deathinfor[0]
+                deathname = de["death"]
+                cause = de["cause"]
+                responsible = de["responsible"]
+                lastwords = de["last_words"]
+                season = de["season"]
+                epi = de["episode"]
+                deathdate = f"S{season}E{epi}"
+
+                if deathname == responsible:
+                    responsible = "Suicide / Self Responsible"
+
+                dead = f"**Cause:** [``{cause}``]\n**Responsible:** [``{responsible}``]\n**Last Words:** [``{lastwords}``]\n**When?:** [``{deathdate}``]"
+                em.add_field(name=f"Death Info:",value=f"{dead}")
+
+            await ctx.send(embed=em)
+        except Exception:
+            if character = None:
+                await ctx.send("Error, Retrying",delete_after=3)
+                await ctx.invoke(self.bot.get_command('breakingbad'))
+            else:
+                await ctx.send("Unknown Character",delete_after=2)
+                
 
 
 def setup(bot):
