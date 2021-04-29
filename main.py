@@ -78,7 +78,8 @@ async def on_message(message):
         return
     prefix = get_prefix(bot, message)
     em = discord.Embed(color=random.randint(0, 0xFFFFFF))
-    em.description = f"**Prefix For ``{message.guild}`` Is ``{prefix[0]}``**"
+    em.description = f"**Prefix For ``{message.guild}`` Is ``{prefix[0]}``**"	
+    await message.channel.send(embed=em)
     
 
         
