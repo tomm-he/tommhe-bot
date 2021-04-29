@@ -213,7 +213,7 @@ class help(commands.Cog):
                     responsible = "Suicide / Self Responsible"
 
                 dead = f"**Cause:** [``{cause}``]\n**Responsible:** [``{responsible}``]\n**Last Words:** [``{lastwords}``]\n**When?:** [``{deathdate}``]"
-                em.add_field(name=f"Death Info:",value=f"{dead}")
+                em.add_field(name=f"Death Info:",value= dead)
 
             await ctx.send(embed=em)
         except Exception:
