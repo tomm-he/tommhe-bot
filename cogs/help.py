@@ -21,14 +21,6 @@ class help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def get_prefix(self, ctx):
-    	if not ctx.guild:
-        	return "!"
-    	prefix = self.bot.cur.execute(f"SELECT prefix FROM prefix WHERE guild = {ctx.guild.id}").fetchall()
-    	if prefix == []:
-        	return "!"
-    	return prefix[0]
-
     @commands.command()
     @commands.has_permissions(manage_guild=True)
     async def prefix(self, ctx, prefix):
