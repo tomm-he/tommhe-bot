@@ -139,6 +139,7 @@ class help(commands.Cog):
     async def breakingbad(self,ctx, *, character = None):
         """ A Breaking Bad Character Database command that adapts to a inconsistent and buggy api -_- """
         await ctx.message.delete()
+        await ctx.channel.trigger_typing()
 
         char = str(character).replace(" ","+")
 
