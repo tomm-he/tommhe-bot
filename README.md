@@ -11,6 +11,7 @@ A Cross-Platform Sports Streaming Discord Bot!
 ## Features
   * Custom Prefix.
   * Commands For All Major Sports.
+  * Extra Misc Commands.
 
 ## Commands
   * help
