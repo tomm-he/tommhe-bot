@@ -9,9 +9,8 @@ A Cross-Platform Sports Streaming Discord Bot!
 
 
 ## Features
-  * Easy to run (just make sure Python is installed, and run!)
-  * Custom Prefix!
-  * Commands For All Major Sports!
+  * Custom Prefix.
+  * Commands For All Major Sports.
 
 ## Commands
   * help
