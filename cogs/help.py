@@ -83,8 +83,8 @@ class help(commands.Cog):
         try:
             fmt = "%H:%M %p" # "**%d-%m-%Y** **%H:%M %p** %Z%z"
         
-            clouds = w.detailed_status                          # 'clouds report'
-            wind = w.wind()["speed"]                            # {'deg': 330}
+            clouds = w.detailed_status                         
+            wind = w.wind()["speed"]                            
             humidity = w.humidity                               
             tempmax  = w.temperature('celsius')["temp_max"]
             temp = w.temperature('celsius')["temp"]
