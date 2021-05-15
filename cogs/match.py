@@ -116,7 +116,7 @@ class send_links(commands.Cog):
                 	embed2.set_footer(text= f"Requested By: {ctx.author.name}#{ctx.author.discriminator}", icon_url=f"{ctx.author.avatar_url}")
                 	embeds.insert(1, embed2)
 
-            	await paginator.run()
+            	
 		# success logging purposes, 
             	#e = discord.Embed(title='!match Command Used', colour=0xDE6246)
             	#e.set_author(name=str(ctx.author), icon_url=ctx.author.avatar_url)
@@ -128,6 +128,8 @@ class send_links(commands.Cog):
             	#e.set_footer(text='Author ID: {}'.format(ctx.author.id))
             	#senderchannel = self.bot.get_channel(logging_channel_id) # <---
             	#await senderchannel.send(embed=e)
+		
+		await paginator.run()
             
         	else:
             		m = discord.Embed(color=random.randint(0, 0xFFFFFF))
