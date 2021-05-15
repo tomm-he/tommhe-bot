@@ -75,7 +75,6 @@ class send_links(commands.Cog):
             		get_links(link_part_2)
 
         	i = 0
-        	digit = random.randint(10,16)
         	select = []
         	if links != []:
             	await channel.purge(limit=7, check = delete, bulk = True)
