@@ -15,7 +15,7 @@ owm = OWM('OWM_TOKEN') # Gain the token at https://home.openweathermap.org/users
 mgr = owm.weather_manager()
 
 
-
+afkdict = {}
 
 class help(commands.Cog):
     def __init__(self, bot):
@@ -216,7 +216,47 @@ class help(commands.Cog):
             else:
                 await ctx.send("Unknown Character",delete_after=2)
                 
-
+    # basic and plain AFK command, will not support cross server                             
+    @commands.command()
+    async def afk(self, ctx, *, message="AFK"):
+        global afkdict
+        
+        if ctx.author.id not in afkdict:
+            afkdict[ctx.author.id] = message
+            
+            name = ctx.author.name
+            
+            if len(name) <= 32:
+                num = 32 - len("[AFK]")
+                split = len(name) - num
+                name = name[:-split]
+                await ctx.author.edit(nick=f"[AFK] {name}")
+                
+                em = discord.Embed(color=random.randint(0, 0xFFFFFF))
+                em.description = f":x: **{ctx.author.name}** is now ``[AFK]``: {afkdict[ctx.author.id]}"
+                await ctx.send(embed=em)
+                
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        global afkdict
+        
+        if message.author.id in afkdict and message.author != message.author.bot and "afk" not in message.content:
+            afkdict.pop(message.author.id)
+            
+            em = discord.Embed(color=random.randint(0, 0xFFFFFF))
+            em.description = f":white_check_mark:  Welcome back! **{message.author.name}**"
+            await message.channel.send(embed=em,delete_after=5)
+            await message.author.edit(nick=message.author.name)
+            
+        for member in message.mentions:
+            if member.id in afkdict:
+                afkmsg = afkdict[message.author.id]
+                
+                if member.id != message.author.id:
+                    em = discord.Embed(color=random.randint(0, 0xFFFFFF))
+                    em.description = f":x: **{member}** is AFK: ``{afkmsg}``"
+                    
+                    await message.channel.send(embed=em,delete_after=5)                    
 
 def setup(bot):
     bot.add_cog(help(bot))
