@@ -227,7 +227,7 @@ class help(commands.Cog):
             name = ctx.author.name
             
             if len(name) <= 32:
-                num = 32 - len("[AFK]")
+                num = 32 - len("[AFK] ")
                 split = len(name) - num
                 name = name[:-split]
                 await ctx.author.edit(nick=f"[AFK] {name}")
