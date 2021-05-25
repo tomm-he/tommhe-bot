@@ -42,6 +42,9 @@ async def on_ready():
         print(bot.user.id)
         bot.loop.create_task(status_task())
         bot.cur.execute("CREATE TABLE IF NOT EXISTS prefix(guild INT, prefix TEXT)")
+	bot.cur.execute("CREATE TABLE IF NOT EXISTS mutes(userid INT, finaltime TEXT, channelid INT, guildid INT)")
+	
+	
         
         
 		
