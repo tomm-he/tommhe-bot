@@ -4,6 +4,7 @@ import discord
 import random
 import sqlite3
 import datetime
+from datetime import timedelta
 import requests
 from pyowm import OWM
 
