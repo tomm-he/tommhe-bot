@@ -7,7 +7,7 @@ import datetime
 import requests
 from pyowm import OWM
 
-from discord.ext import commands
+from discord.ext import commands,tasks
 
 extensions = ["cogs.help","cogs.boxing","cogs.boxingnames","cogs.match","cogs.motogp","cogs.motogpnames","cogs.names","cogs.nba","cogs.nhl","cogs.nhlnames","cogs.ufc","cogs.ufcnames","cogs.f1","cogs.f1names","cogs.nfl","cogs.nflnames"]
 
@@ -20,7 +20,8 @@ afkdict = {}
 class help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
+        self.unmute_checker.start()
+        
     @commands.command()
     @commands.has_permissions(manage_guild=True)
     async def prefix(self, ctx, prefix):
@@ -256,7 +257,79 @@ class help(commands.Cog):
                     em = discord.Embed(color=random.randint(0, 0xFFFFFF))
                     em.description = f":x: **{member}** is AFK: ``{afkmsg}``"
                     
-                    await message.channel.send(embed=em,delete_after=5)                    
+                    await message.channel.send(embed=em,delete_after=5)
+                    
+    @commands.command() 
+    @commands.is_owner()
+    async def mutetest(self,ctx,member: discord.Member,time,*,reason = "No Reason Provided"):
+        member = member or member.id or member.name
+        
+        
+        
+        await ctx.message.delete()
+        server = ctx.guild
+
+        time_convert = {"s":1, "m":60, "h":3600,"d":86400}
+        tempmute = int(time[0]) * time_convert[time[-1]]
+
+        quick_add = timedelta(hours=1)
+        date = datetime.datetime.utcnow() + quick_add
+
+        addedtime = timedelta(seconds=tempmute)
+        finaltime = (date + addedtime)
+
+        muted_until = finaltime.strftime("%d:%H:%M:%S")
+
+        try:
+            
+            self.bot.cur.execute(f"INSERT INTO mutes(userid, finaltime,channelid,guildid) VALUES({member.id}, '{muted_until}',{ctx.channel.id},{ctx.guild.id})")
+            self.bot.con.commit()
+            
+            muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
+            if muted_role == None:
+                
+                for channel in server.channels:
+                    await member.set_permissions(overwrite=discord.PermissionOverwrite(send_messages = False))
+                await ctx.send(f"{member} Muted for {time} Untill {muted_until} for Reason: {reason}")
+                
+            else:
+                await member.add_roles(muted_role)
+                await ctx.send(f"{member} Muted for {time} Untill {muted_until} for Reason: {reason}")
+        except Exception as e:
+            await ctx.send(e)
+            print(e)
+            
+    @tasks.loop(seconds=1)
+    async def unmute_checker(self):
+        
+        b = datetime.datetime.utcnow() + timedelta(hours=1)
+        a = b.strftime("%d:%H:%M:%S")
+        
+        tuplelist = self.bot.cur.execute('SELECT finaltime FROM mutes').fetchall()
+        list = [item for t in tuplelist for item in t]
+        
+        user = self.bot.cur.execute(f"SELECT userid FROM mutes WHERE finaltime = ?",(a,)).fetchone()
+        channelid = self.bot.cur.execute(f"SELECT channelid FROM mutes WHERE finaltime = ?",(a,)).fetchone()
+        
+        guildid = self.bot.cur.execute(f"SELECT guildid FROM mutes WHERE finaltime = ?",(a,)).fetchone()
+        
+        for i in list:
+            if a == i: 
+                
+                unmuted_userid = self.bot.cur.execute(f"SELECT userid FROM mutes WHERE finaltime = ?",(a,)).fetchone()
+                guild = self.bot.get_guild(guildid[0])
+
+                member = await self.bot.get_user(user[0])
+                channel = self.bot.get_channel(channelid[0])
+                muted_role = discord.utils.get(guild.roles, name="Muted")
+                
+                try:
+                    await member.remove_roles(muted_role)
+                    await channel.send(f"{member.mention} Now Unmuted!")
+                else:
+                    for channel in guild.channels:
+                        await member.set_permissions(overwrite=discord.PermissionOverwrite(send_messages = True))
+                    await channel.send((f"{member.mention} Now Unmuted!")            
 
 def setup(bot):
     bot.add_cog(help(bot))
