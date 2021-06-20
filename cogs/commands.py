@@ -10,13 +10,18 @@ from pyowm import OWM
 
 from discord.ext import commands,tasks
 
-extensions = ["cogs.help","cogs.boxing","cogs.boxingnames","cogs.match","cogs.motogp","cogs.motogpnames","cogs.names","cogs.nba","cogs.nhl","cogs.nhlnames","cogs.ufc","cogs.ufcnames","cogs.f1","cogs.f1names","cogs.nfl","cogs.nflnames"]
+extensions = ["cogs.commands","cogs.boxing","cogs.boxingnames","cogs.match","cogs.motogp","cogs.motogpnames","cogs.names","cogs.nba","cogs.nhl","cogs.nhlnames","cogs.ufc","cogs.ufcnames","cogs.f1","cogs.f1names","cogs.nfl","cogs.nflnames"]
 
 owm = OWM('OWM_TOKEN') # Gain the token at https://home.openweathermap.org/users/sign_up
 mgr = owm.weather_manager()
 
 
 afkdict = {}
+
+async def embedsend(destination, msg):
+    em = discord.Embed(color=random.randint(0, 0xFFFFFF))
+    em.description = msg
+    await destination.send(embed=em)
 
 class help(commands.Cog):
     def __init__(self, bot):
@@ -262,16 +267,19 @@ class help(commands.Cog):
                     
     @commands.command() 
     @commands.is_owner()
-    async def mutetest(self,ctx,member: discord.Member,time,*,reason = "No Reason Provided"):
-        member = member or member.id or member.name
-        
-        
+    async def mute(self,ctx,member: discord.Member,time = None,*,reason = "No Reason Provided"):
+        """db mute command, !mute [@user/user.id/user.name INTs/m/h/d] (reason)"""
+        time_convert = {"s":1, "m":60, "h":3600,"d":86400}
+        if time[-1] not in time_convert.keys():
+            await ctx.send("Time Inputs Are ``s, m, h, d``")
+            return
         
         await ctx.message.delete()
         server = ctx.guild
 
-        time_convert = {"s":1, "m":60, "h":3600,"d":86400}
         tempmute = int(time[0]) * time_convert[time[-1]]
+
+        timestr = {"m":"Minute(s)", "h":"Hour(s)", "d":"Day(s)"}
 
         quick_add = timedelta(hours=1)
         date = datetime.datetime.utcnow() + quick_add
@@ -282,55 +290,79 @@ class help(commands.Cog):
         muted_until = finaltime.strftime("%d:%H:%M:%S")
 
         try:
-            
-            self.bot.cur.execute(f"INSERT INTO mutes(userid, finaltime,channelid,guildid) VALUES({member.id}, '{muted_until}',{ctx.channel.id},{ctx.guild.id})")
-            self.bot.con.commit()
-            
-            muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
-            if muted_role == None:
+            if time is not None:
+                self.bot.cur.execute(f"INSERT INTO mutes(userid, finaltime,channelid,guildid) VALUES({member.id}, '{muted_until}',{ctx.channel.id},{ctx.guild.id})")
+                self.bot.con.commit()
                 
-                for channel in server.channels:
-                    await member.set_permissions(overwrite=discord.PermissionOverwrite(send_messages = False))
-                await ctx.send(f"{member} Muted for {time} Untill {muted_until} for Reason: {reason}")
+                muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
+                result = ''.join([i for i in time if not i.isdigit()])
+                strtime = timestr[result]
+                timeconvert = time[0]
                 
+                if reason == "No Reason Provided":
+                    msg = f"{member} Muted for {timeconvert} {strtime}"
+                else:
+                    msg = f"{member} Muted for {timeconvert} {strtime} Reason: {reason}"
+                    
+
+
+                if muted_role is None:
+                    for channel in server.channels:
+                        await channel.set_permissions(member,overwrite=discord.PermissionOverwrite(send_messages = False))
+                    
+                    await embedsend(ctx,msg)
+                else:
+                    await member.add_roles(muted_role)
+                    await ctx.send(f"{member} Muted for {time} Untill {muted_until} for Reason: {reason}")
             else:
-                await member.add_roles(muted_role)
-                await ctx.send(f"{member} Muted for {time} Untill {muted_until} for Reason: {reason}")
+                if reason == "No Reason Provided":
+                    msg = f"{member} Muted."
+                else:
+                    msg = f"{member} Muted for Reason: {reason}"
+                    
+                    
+                if muted_role is None:
+                    for channel in server.channels:
+                        await channel.set_permissions(member,overwrite=discord.PermissionOverwrite(send_messages = False))
+                        
+                    await embedsend(ctx,msg)
+                    
+                else:
+                    await member.add_roles(muted_role)
+                    await embedsend(ctx,msg)
+
         except Exception as e:
             await ctx.send(e)
             print(e)
             
     @tasks.loop(seconds=1)
     async def unmute_checker(self):
-        
+        """unmute checker, if muted time == time now, unmute triggered"""
         b = datetime.datetime.utcnow() + timedelta(hours=1)
         a = b.strftime("%d:%H:%M:%S")
         
         tuplelist = self.bot.cur.execute('SELECT finaltime FROM mutes').fetchall()
+        
         list = [item for t in tuplelist for item in t]
         
         user = self.bot.cur.execute(f"SELECT userid FROM mutes WHERE finaltime = ?",(a,)).fetchone()
         channelid = self.bot.cur.execute(f"SELECT channelid FROM mutes WHERE finaltime = ?",(a,)).fetchone()
-        
         guildid = self.bot.cur.execute(f"SELECT guildid FROM mutes WHERE finaltime = ?",(a,)).fetchone()
         
-        for i in list:
-            if a == i: 
-                
-                unmuted_userid = self.bot.cur.execute(f"SELECT userid FROM mutes WHERE finaltime = ?",(a,)).fetchone()
-                guild = self.bot.get_guild(guildid[0])
-
-                member = await self.bot.get_user(user[0])
-                channel = self.bot.get_channel(channelid[0])
-                muted_role = discord.utils.get(guild.roles, name="Muted")
-                
-                try:
-                    await member.remove_roles(muted_role)
-                    await channel.send(f"{member.mention} Now Unmuted!")
-                else:
-                    for channel in guild.channels:
-                        await member.set_permissions(overwrite=discord.PermissionOverwrite(send_messages = True))
-                    await channel.send((f"{member.mention} Now Unmuted!")            
+        if a in list:
+            guild = self.bot.get_guild(guildid[0])
+            member = guild.get_member(user[0])
+            channel = self.bot.get_channel(channelid[0])
+            
+            muted_role = discord.utils.get(guild.roles, name="Muted")
+            
+            if muted_role in member.roles:
+                await member.remove_roles(muted_role)
+                await embedsend(channel,f"{member.mention} Is Now Unmuted.")
+            else:
+                await embedsend(channel,f"{member.mention} Is Now Unmuted.")
+                for chan in guild.channels:
+                    await chan.set_permissions(member,overwrite=discord.PermissionOverwrite(send_messages = True))        
 
 def setup(bot):
     bot.add_cog(help(bot))
