@@ -271,7 +271,7 @@ class help(commands.Cog):
         """db mute command, !mute [@user/user.id/user.name INTs/m/h/d] (reason)"""
         time_convert = {"s":1, "m":60, "h":3600,"d":86400}
         if time[-1] not in time_convert.keys():
-            await ctx.send("Time Inputs Are ``s, m, h, d``")
+            await embedsend(ctx,"Time Inputs Are ``s, m, h, d``")
             return
         
         await ctx.message.delete()
