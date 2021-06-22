@@ -12,7 +12,7 @@ from discord.ext import commands,tasks
 
 extensions = ["cogs.commands","cogs.boxing","cogs.boxingnames","cogs.match","cogs.motogp","cogs.motogpnames","cogs.names","cogs.nba","cogs.nhl","cogs.nhlnames","cogs.ufc","cogs.ufcnames","cogs.f1","cogs.f1names","cogs.nfl","cogs.nflnames"]
 
-owm = OWM('OWM_TOKEN') # Gain the token at https://home.openweathermap.org/users/sign_up
+owm = OWM(os.environ["weatherapi"]) # Gain the token at https://home.openweathermap.org/users/sign_up
 mgr = owm.weather_manager()
 
 
