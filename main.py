@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from os import listdir
-from os.path import isfile
 from os.path import isfile, join
 import traceback
 import random
@@ -12,6 +11,9 @@ from discord.utils import find
 import datetime
 import time
 from discord.ext import commands
+import dotenv
+
+dotenv.load_dotenv()
 
 cogs_dir = "cogs"
 
@@ -138,4 +140,4 @@ async def on_command_error(ctx, error):
 
     
 
-bot.run('DISCORD_BOT_TOKEN_HERE')
+bot.run(os.environ["token"])
